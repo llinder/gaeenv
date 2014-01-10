@@ -23,8 +23,9 @@ test1:
 	@rm -rf env                           && \
 		virtualenv --no-site-packages env && \
 		. env/bin/activate                && \
+                pip install requests              && \
 		python setup.py install           && \
-		gaeenv list sdk                   && \
-                gaeenv install sdk
+		gaeenv -vv list sdk               && \
+                gaeenv -vv install sdk
 
 tests: clean test1
