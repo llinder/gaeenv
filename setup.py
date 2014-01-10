@@ -29,7 +29,7 @@ setup(
     description="Goole App Engine virtual environment builder",
     long_description=ldesc,
     packages = find_packages(exclude="test"),
-    requires = ['requests'],
+    install_requires = ['requests'],
     entry_points={
         'console_scripts': ['gaeenv = gaeenv.main:main']
     },

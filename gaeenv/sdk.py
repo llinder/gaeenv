@@ -32,6 +32,13 @@ def install(env_dir, version=None):
 	with ZipFile(zip_file) as z:
 		z.extractall(lib_dir)
 
+	# change file mode for executable files
+	sdk_dir = os.path.join(lib_dir, 'google_appengine')
+	py_files = [ os.path.join(sdk_dir, f) for f in os.listdir(sdk_dir) if os.path.isfile(os.path.join(sdk_dir,f)) and f.endswith('.py') ]
+	for f in py_files:
+		st = os.stat(f)
+		os.chmod(f, st.st_mode | 0111)					
+
 	# remove temp zip file
 	logger.debug(" * Cleaning up".format(lib_dir))
 	os.remove(zip_file)
