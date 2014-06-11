@@ -148,11 +148,6 @@ def install_sdk(args):
 
 def install_requirements(args):
     logger.info(' * Installing Python requirements')
-    # validate virtualenv directory
-    virtual_env_dir = os.environ.get(VIRTUAL_ENV)
-    if not virtual_env_dir:
-        logger.error("Virtualenv doesn't exist. Please ensure one is activated.")
-        sys.exit(1)
 
     # validate requirements file
     if not os.path.exists(args.requirements):

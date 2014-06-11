@@ -26,10 +26,10 @@ setup(
     license='Apache 2.0',
     author='Lance Linder',
     author_email='llinder@gmail.com',
-    description="Goole App Engine virtual environment builder",
+    description="Goole App Engine Virtualenv tools",
     long_description=ldesc,
     packages = find_packages(exclude="test"),
-    install_requires = ['requests'],
+    install_requires = ['requests>=2.2.0'],
     entry_points={
         'console_scripts': ['gaeenv = gaeenv.main:main']
     },

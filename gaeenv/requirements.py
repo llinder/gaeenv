@@ -22,14 +22,15 @@ def link(req_file, lib_dir):
 
 	links = []
 	package_path = get_python_lib()
+	print package_path
 	for requirement in requirements:
 		try:
 			dist = pkg_resources.get_provider(requirement)
 		except pkg_resources.DistributionNotFound:
-			logger.warn(' * Please install [%s]' % requirement)
+			logger.error(' * Please install [%s]' % requirement)
 			continue
 		except pkg_resources.VersionConflict:
-			logger.warn(' * Version don\'t match [%s] - create virtualenv or match the version' % requirement)
+			logger.error(' * Version don\'t match [%s] - create virtualenv or match the version' % requirement)
 			continue
 
 		if dist.has_metadata('top_level.txt'):
