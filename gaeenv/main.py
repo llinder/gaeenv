@@ -10,7 +10,7 @@
     :license: Apache 2.0, see LICENSE for more details.
 """
 
-gaeenv_version = '0.1.2'
+gaeenv_version = '0.1.3'
 
 import sys
 import os
