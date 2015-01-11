@@ -3,6 +3,7 @@ import sys
 import shutil
 import requests
 import re
+import xml.etree.ElementTree as ET
 
 from tempfile import gettempdir
 from utils import logger, writefile
@@ -48,17 +49,26 @@ def download(version=None):
     Download App Engine SDK
     """
 	if not version:
-		lvt = get_latest_version()
-		version = '{0}.{1}.{2}'.format(*lvt)
+		version = get_latest_version()
 
-	gae_url = 'http://googleappengine.googlecode.com/files/google_appengine_{0}.zip'.format(version)
+	response = requests.get('https://storage.googleapis.com/appengine-sdks')
+	response.raise_for_status()
+	tree = ET.fromstring(response.text)
 
-	logger.debug(' * Starting SDK download for version %s' % version)
-	response = requests.get(gae_url)
+	path = None
+	for key in tree.iter('{http://doc.s3.amazonaws.com/2006-03-01}Key'):
+		match = re.match('^.*google_appengine_{0}.{1}.{2}\.zip$'.format(*version), key.text)
+		if match:
+			path = key.text
+			break
+
+	url = 'https://storage.googleapis.com/appengine-sdks/{path}'.format(**locals())
+
+	logger.debug(' * Starting SDK download for version {0}.{1}.{2}'.format(*version))
+	response = requests.get(url)
 	response.raise_for_status()
 
-	temp_dir = gettempdir()
-	temp_zip = os.path.join(temp_dir, 'google_appengine_%s.zip' % version)
+	temp_zip = os.path.join(gettempdir(), 'google_appengine_{0}.{1}.{2}.zip'.format(*version))
 	writefile(temp_zip, response.content, encode=None)
 	return temp_zip
 
@@ -66,29 +76,29 @@ def get_versions():
 	"""
 	Retrieves all available App Engine SDK get_versions
 	"""
-	response = requests.get('https://code.google.com/p/googleappengine/downloads/list?can=1&q=&colspec=Filename&num=2000')
+	versions = []
+	response = requests.get('https://storage.googleapis.com/appengine-sdks')
 	response.raise_for_status()
 
-	versions = []
-	for match in re.finditer(r'google_appengine_([0-9]+)\.([0-9]+)\.([0-9]+)\.zip', response.text):
-		versions.append((match.group(1),match.group(2),match.group(3)))
+	tree = ET.fromstring(response.text)
 
-	return sorted(set(versions), key=lambda tup: str(tup), reverse=True)
+	for key in tree.iter('{http://doc.s3.amazonaws.com/2006-03-01}Key'):
+		match = re.match(r'^.*google_appengine_([0-9]+)\.([0-9]+)\.([0-9]+)\.zip$', key.text)
+		if match:
+			versions.append((
+				int(match.group(1)),
+				int(match.group(2)),
+				int(match.group(3))
+			))
 
-__latest_version = None
+	def compare(x, y):
+		return  sum(y) - sum(x)
+	
+	return sorted(versions, cmp=compare)
+
 def get_latest_version():
 	"""
 	Retrieves the latest App Engine SDK version
 	"""
-	global __latest_version
-	if not __latest_version:
-		response = requests.get('https://code.google.com/p/googleappengine/downloads/list?can=2&q=&colspec=Filename')
-		response.raise_for_status()
-		
-		match = re.search(r'google_appengine_([0-9]+)\.([0-9]+)\.([0-9]+)\.zip', response.text)
-		if match:
-			__latest_version = (match.group(1),match.group(2),match.group(3))
-		else:
-			raise Exception('App Engine SDK version not found') 
-
-	return __latest_version
+	versions = get_versions()
+	return versions[0]

@@ -2,7 +2,7 @@
 *.pyo
 *.swp
 env
-/TODO
-/build/
-/dist/
-/*.egg-info/
+TODO
+build/
+dist/
+*.egg-info/

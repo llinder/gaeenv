@@ -7,14 +7,14 @@ Google App Engine Virtual Environment builder.
 import os
 from setuptools import setup, find_packages
 from gaeenv.main import gaeenv_version
+from pip.req import parse_requirements
 
 def read_file(file_name):
-    return open(
-        os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            file_name
-        )
-    ).read()
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), file_name)
+    with open(path) as f:
+        return f.read()
+
+required = read_file('requirements.txt').splitlines()
 
 ldesc = read_file('README')
 ldesc += "\n\n" + read_file('CHANGES')
@@ -29,7 +29,7 @@ setup(
     description="Goole App Engine Virtualenv tools",
     long_description=ldesc,
     packages = find_packages(exclude="test"),
-    install_requires = ['requests>=2.2.0'],
+    install_requires = required,
     entry_points={
         'console_scripts': ['gaeenv = gaeenv.main:main']
     },
