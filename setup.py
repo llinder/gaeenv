@@ -26,7 +26,7 @@ setup(
     license='Apache 2.0',
     author='Lance Linder',
     author_email='llinder@gmail.com',
-    description="Goole App Engine Virtualenv tools",
+    description="Google App Engine Virtualenv tools",
     long_description=ldesc,
     packages = find_packages(exclude="test"),
     install_requires = required,
