@@ -50,6 +50,8 @@ def download(version=None):
     """
 	if not version:
 		version = get_latest_version()
+	if type(version) is str:
+		version = tuple(version.split('.'))
 
 	response = requests.get('https://storage.googleapis.com/appengine-sdks')
 	response.raise_for_status()
